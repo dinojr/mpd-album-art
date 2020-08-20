@@ -23,7 +23,7 @@
 """
 
 from pylast import LastFMNetwork, AlbumSearch
-from mpd import MPDClient, socket
+from mpd import *
 
 import os, sys
 try:
