@@ -241,7 +241,7 @@ def _sanitize(name):
 
 
 if __name__ == '__main__':
-    import argparse, os
+    import argparse, os, re
 
     home_dir = os.environ['HOME']
     parser = argparse.ArgumentParser()
@@ -275,13 +275,28 @@ if __name__ == '__main__':
         # No song is playing
         grabber.remove_current_link()
 
-    # try local pics
-    elif grabber.get_local_art(current_song) is not None:
-        sys.stderr.write('Found local image, not querying LastFM.\n')
-    
-    # try lastFM pics
-    elif grabber.get_art(current_song) is not None:
-        sys.stderr.write('Found lastFM image.\n')
+    else:
+
+        #Parse Radio streaming
+        if 'http' in current_song['file']:
+            # temp_file = current_song['file']
+            current_song['artist'] = re.split('(\w[^-]*\w)',current_song['title'])[1]
+            current_song['title'] = re.split('(\w[^-]*\w)',current_song['title'])[3]
+            current_song['album'] = ''
+            sys.stderr.write('Parsed an http stream\n')
+            sys.stderr.write(current_song['artist']+'\n')
+            sys.stderr.write(current_song['title']+'\n')
+            if grabber.get_art(current_song) is not None:
+                sys.stderr.write('Found lastFM image.\n')
+            # current_song['title'] = temp_file
+
+         # try local pics for local songs
+        elif grabber.get_local_art(current_song) is not None:
+            sys.stderr.write('Found local image, not querying LastFM.\n')
+            
+        # try lastFM pics for local songs
+        elif grabber.get_art(current_song) is not None:
+            sys.stderr.write('Found lastFM image.\n')
 
     # Potentially link to a default image here (link has been destroyed at this
     # point)
